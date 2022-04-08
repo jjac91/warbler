@@ -308,6 +308,7 @@ def messages_add():
 
     form = MessageForm()
 
+
     if form.validate_on_submit():
         msg = Message(text=form.text.data)
         g.user.messages.append(msg)
@@ -322,7 +323,7 @@ def messages_add():
 def messages_show(message_id):
     """Show a message."""
 
-    msg = Message.query.get(message_id)
+    msg = Message.query.get_or_404(message_id)
     return render_template('messages/show.html', message=msg)
 
 
@@ -335,6 +336,10 @@ def messages_destroy(message_id):
         return redirect("/")
 
     msg = Message.query.get(message_id)
+    if msg.user_id != g.user.id:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
     db.session.delete(msg)
     db.session.commit()
 
