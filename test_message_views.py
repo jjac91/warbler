@@ -6,7 +6,7 @@
 
 
 import os
-from unittest import TestCase
+import pdb; pdb.set_trace()
 
 from models import db, connect_db, Message, User
 from sqlalchemy import exc
@@ -97,10 +97,12 @@ class MessageViewTestCase(TestCase):
             self.assertIn("Access unauthorized", str(resp.data))
     
     def test_add_different_user(self):
-        """tests adding a message with a user"""
+        """tests adding a message with a different user"""
         with self.client as c:
             with c.session_transaction() as sess:
                 sess[CURR_USER_KEY] = self.testuser.id
+                sess['user2']= self.testuser2.id
+            
 
             resp=c.post("/messages/new", data={"text": "Hello","user_id":self.testuser2.id}, follow_redirects=True)
             self.assertEqual(resp.status_code, 200)
